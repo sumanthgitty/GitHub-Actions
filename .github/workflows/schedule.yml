@@ -6,7 +6,7 @@ on:
 
 jobs:
   hello-world:
-    runs-on: ubuntu:latest                  #runs-on specifies the environment (or runner) where the jobs in a workflow will be executed.
+    runs-on: ubuntu-latest                  #runs-on specifies the environment (or runner) where the jobs in a workflow will be executed.
     steps:
       - name: Echo current time
         run: echo "The current server time is $(date)"
