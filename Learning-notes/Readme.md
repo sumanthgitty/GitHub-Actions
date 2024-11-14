@@ -1,4 +1,5 @@
 #### Introduction to GitHub Actions
+---
 GitHub Actions is a CI/CD pipeline directly integrated with your GitHub repository.
 
 GitHub Actions allows you to automate:
@@ -16,6 +17,7 @@ and more…
 Within a GitHub repo, you’ll have a tab for **Actions**.
 
 #### Workflows
+---
 A workflow is a **configurable automated process** that will run one or more jobs.
 Workflows are defined by a YAML file checked into your repository 
 
@@ -37,6 +39,7 @@ name: macOS Workflow Example
 ```
 
 #### Workflow Components
+---
 The following GitHub Actions Workflows components:
 
 - **Actions:** Reusable tasks that perform specific jobs within a workflow.
