@@ -93,4 +93,47 @@ jobs:
 
 You can use https://crontab.guru/ to translate time into a cron expression or Chatgpt.
 
+#### Triggering Single or Multiple Events
+
+Single event. eg push
+```sh
+name: CI on Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run a one-line script
+        run: echo "Hello, world!"
+```
+
+Multiple events eg. push,pull request, release
+```sh
+name: CI on Multiple Events
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [published, created]
+
+jobs:
+  build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+```
+
+If you specify multiple events, only one of those events needs to occur to trigger your workflow.
+If multiple triggering events for your workflow occur at the same time, multiple workflow runs will be triggered.
 
