@@ -94,8 +94,9 @@ jobs:
 You can use https://crontab.guru/ to translate time into a cron expression or Chatgpt.
 
 #### Triggering Single or Multiple Events
+---
 
-Single event. eg push
+- Single event. eg push
 ```sh
 name: CI on Push
 
@@ -113,7 +114,7 @@ jobs:
         run: echo "Hello, world!"
 ```
 
-Multiple events eg. push,pull request, release
+- Multiple events eg. push,pull request, release
 ```sh
 name: CI on Multiple Events
 on:
