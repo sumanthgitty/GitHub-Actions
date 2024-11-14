@@ -61,4 +61,36 @@ The following GitHub Actions Workflows components:
 - **Permissions:** Control access to the repository and API for workflow actions.
 - **Concurrency:** Manage multiple workflow runs, canceling or preventing concurrent executions.
 
+#### Triggering Schedule Event
+---
+Schedule can use a cron expression to trigger a workflow at a specific time or day.
+
+(on: This keyword defines the event that triggers a workflow to run. It specifies when the workflow should be executed, such as on push, pull_request, or a scheduled time.)
+
+- This event will only trigger a workflow run if the workflow file is on the default branch.
+- Scheduled workflows will only run on the default branch.
+- In a public repository, scheduled workflows are automatically disabled when no repository activity has occurred in 60 days. For information on re-enabling a disabled workflow, see "Disabling and enabling a workflow."
+- When the last user to commit to the cron schedule of a workflow is removed from the organization, the scheduled workflow will be disabled. If a user with write permissions to the repository makes a commit that changes the cron schedule, the scheduled workflow will be reactivated.
+
+Example:
+
+```sh
+on:
+  schedule:
+    - cron: '30 5 * * 1,3'
+    - cron: '30 5 * * 2,4'
+
+jobs:
+  test_schedule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Not on Monday or Wednesday
+        if: github.event.schedule != '30 5 * * 1,3'
+        run: echo "Skip this step on Monday and Wednesday"
+      - name: Every time
+        run: echo "This step will always run"
+```
+
+You can use https://crontab.guru/ to translate time into a cron expression or Chatgpt.
+
 
