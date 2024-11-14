@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  hello-world
+  hello-world:
     runs-on: ubuntu-latest
     steps:
       - name: "echo basic information"
