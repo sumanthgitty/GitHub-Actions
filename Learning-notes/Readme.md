@@ -138,3 +138,52 @@ jobs:
 If you specify multiple events, only one of those events needs to occur to trigger your workflow.
 If multiple triggering events for your workflow occur at the same time, multiple workflow runs will be triggered.
 
+#### Manual Events
+---
+You can trigger a workflow manually via the **GitHub UI, GitHub CLI, or GitHub REST API**
+
+Using the gh workflow run command:
+
+sh```
+gh workflow run greet.yml \
+-f name=mona \
+-f greeting=hello \
+-f data=@myfile.txt
+```
+
+You can specify the name, ID, or file name of the workflow you want to run
+
+To run a workflow manually, the workflow must be configured to run on the **workflow_dispatch** event.
+
+```sh
+on:
+  workflow_dispatch
+    inputs:
+      name:
+        description: 'Name of the person to greet'
+        required: true
+        type: string
+      greeting:
+        description: 'Type of greeting'
+        require: true
+        type: string
+      data:
+        description: 'Base64 encoded content of a file'
+        required: false
+        type: string
+```
+
+You can define up to 10 inputs for a workflow_dispatch event.
+
+Running the Workflow Manually in the **GitHub UI:**
+
+After adding the workflow_dispatch event trigger to your workflow file, you can manually trigger the workflow from the GitHub UI by following these steps:
+
+- Navigate to the Actions tab of your repository.
+- On the left-hand side, select the specific workflow you want to run. If you don't see it, make sure to choose it from the list instead of leaving the default selection of "All workflows."
+- You will see a notice indicating: "This workflow has a workflow_dispatch event trigger."
+A Run Workflow button will appear. Clicking it will present a dropdown menu, allowing you to select the branch on which to run the workflow.
+- If the workflow defines input parameters (e.g., name, greeting), you will be prompted to provide those values before running the workflow.
+
+This method allows you to manually run your workflow directly from the UI without needing to use the GitHub CLI or REST API.
+
