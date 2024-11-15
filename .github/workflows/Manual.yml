@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Decode file content
-        run: echo "${{ inputs.data }} | base64 --deecode > decode_file.txt"
+        run: echo "${{ inputs.data }} | base64 --deecode > ./decode_file.txt"
       - name: Display greeting 
         run: echo "${{inputs.greeting}}, ${{inputs.name}}"
       - name: Display file content
-        run: cat decode_file.txt
+        run: cat ./decode_file.txt
