@@ -187,3 +187,49 @@ A Run Workflow button will appear. Clicking it will present a dropdown menu, all
 
 This method allows you to manually run your workflow directly from the UI without needing to use the GitHub CLI or REST API.
 
+#### Webhook Events
+---
+Many of the listed GitHub Workflow Triggers are triggered by a webhook
+
+What is a Webhook? A webhook is a public-facing URL that can be sent an HTTP request (often requiring authorization) to trigger events from external sources.
+
+Most of these webhooks will be triggered within GitHub when users are interacting with GitHub which will in turn will trigger API actions. Users generally don’t have to directly call the API to trigger the workflow.
+
+External Webhook Events
+Using **repository_dispatch** with webhook type you can trigger the Workflow via an external HTTP endpoint.
+
+will only trigger a workflow run if the workflow file is on the default branch
+
+```sh
+name: Workflow on Repository Dispatch
+
+on:
+  repository_dispatch:
+    types:
+    - webhook
+
+jobs:
+  respond-to-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Run a script
+      run: echo "Event of type ${GITHUB_EVENT_NAME}"
+```
+
+When you make the request to the webhook, you must:
+
+- Send a POST request to the rep’s dispatches endpoint
+- Set the Accept type for application/vnd.github+json
+- Provide Authorization for your Personal Access Token
+- Pass the event type ”webhook”
+
+``sh
+curl -X POST \
+-H "Accept: application/vnd.github+json" \
+-H "Authorization: token {personal token with repo access}" \
+-d '{"event_type": "webhook", "client_payload": {"key": "value"}}' \
+https://api.github.com/repos/{owner}/{repo}/dispatches
+```
+
