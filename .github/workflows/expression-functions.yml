@@ -7,6 +7,7 @@ on:
 
 jobs:
   expression-functions:
+    runs-on: ubuntu-latest
     steps:
       - name: check if string contain substring
         if: contains('Hello world', 'wor')
