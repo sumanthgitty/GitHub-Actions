@@ -225,10 +225,27 @@ When you make the request to the webhook, you must:
 - Provide Authorization for your Personal Access Token
 - Pass the event type ”webhook”
 
-``sh
+```sh
 curl -X POST \
 -H "Accept: application/vnd.github+json" \
 -H "Authorization: token {personal token with repo access}" \
 -d '{"event_type": "webhook", "client_payload": {"key": "value"}}' \
 https://api.github.com/repos/{owner}/{repo}/dispatches
 ```
+
+#### Conditional Keywords for Steps
+---
+jobs..if conditional can be used to prevent a job from running unless a condition is met.
+
+name: example-workflow
+on:[push]
+jobs:
+  production-deploy:
+    if: github.repository == 'octo-org/octo-repo-prod'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+      - run: npm install -g bats
