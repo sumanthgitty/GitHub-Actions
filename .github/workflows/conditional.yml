@@ -4,14 +4,14 @@ on:
   push
 
 jobs:
-  Hello-world
-    if: github.repository == 'octo-org/octo-repo-prod'
+  Hello-world:
+    if: github.repository == 'sumanthgitty/GitHub-Actions'
     runs-on: ubuntu-latest
     steps:
       - name: "Hello World"
         run: echo "Hello world!"
   
-  Goodbye-Sumanth
+  Goodbye-Sumanth:
     runs-on: ubuntu-latest
     steps:
       - name: "goodbye"
