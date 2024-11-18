@@ -291,3 +291,20 @@ runs-on: self-hosted
 
 If you specify an array of strings or variables, your workflow will execute on any runner that matches all of the specified runs-on values.
 
+#### Self-Hosted Runner
+Self-hosted runners can be:
+
+- Physical
+- Virtual
+- In a container
+- On-premises
+- In a cloud
+
+You can add self-hosted runners at various levels in the management hierarchy:
+
+- Repository-level runners are dedicated to a single repository.
+- Organization-level runners can process jobs for multiple repositories in an organization.
+- Enterprise-level runners can be assigned to multiple organizations in an enterprise account.
+
+To set up self-hosted, you need to add a runner and install the **GitHub Actions Runner** to connect the external compute to the self-hosted runner.
+After installing the GitHub Actions Runner, ensure **port 443** is open in your outbound rules to allow secure communication between the runner and GitHub.
