@@ -309,3 +309,61 @@ You can add self-hosted runners at various levels in the management hierarchy:
 
 To set up self-hosted, you need to add a runner and install the **GitHub Actions Runner** to connect the external compute to the self-hosted runner.
 After installing the GitHub Actions Runner, ensure **port 443** is open in your outbound rules to allow secure communication between the runner and GitHub.
+
+#### Workflow Commands Summary
+
+Workflow commands in GitHub Actions let you interact with the runner machine during a workflow, performing tasks like setting environment variables, modifying the system PATH, sending debug messages, or sharing data between steps/jobs.
+
+- Set Environment Variables
+Add variables for subsequent steps using $GITHUB_ENV:
+
+```yaml
+steps:
+  - name: Set environment variable
+    run: echo "ACTION_ENV=production" >> $GITHUB_ENV
+```
+
+- Add to System PATH
+Append a directory to the PATH variable using $GITHUB_PATH:
+
+```yaml
+steps:
+  - name: Add directory to PATH
+    run: echo "/path/to/dir" >> $GITHUB_PATH
+```
+
+- Set Output Parameters
+Share data between steps or jobs using $GITHUB_OUTPUT:
+
+```yaml
+steps:
+  - name: Set output
+    id: example_step
+    run: echo "result=output_value" >> $GITHUB_OUTPUT
+  - name: Use output
+    run: echo "The output was ${{ steps.example_step.outputs.result }}"
+```
+
+- Create Debug Messages
+Send debug logs visible only in debug mode:
+
+```yaml
+steps:
+  - name: Debug message
+    run: echo "::debug::This is a debug message"
+```
+
+- Example: Add a directory to PATH and verify:
+
+```yaml
+steps:
+  - name: Add directory to PATH
+    run: echo "$GITHUB_WORKSPACE/my_scripts" >> $GITHUB_PATH
+  - name: Check new PATH
+    run: echo $PATH
+```
+
+Key Points:
+
+$GITHUB_ENV, $GITHUB_PATH, and $GITHUB_OUTPUT are special files for managing variables, PATH, and outputs.
+Use these commands to efficiently share data for the current workflow run or customize the runner environment during workflows.
