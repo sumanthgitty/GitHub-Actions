@@ -292,6 +292,7 @@ runs-on: self-hosted
 If you specify an array of strings or variables, your workflow will execute on any runner that matches all of the specified runs-on values.
 
 #### Self-Hosted Runner
+---
 Self-hosted runners can be:
 
 - Physical
