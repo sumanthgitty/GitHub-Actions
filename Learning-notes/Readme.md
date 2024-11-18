@@ -237,6 +237,7 @@ https://api.github.com/repos/{owner}/{repo}/dispatches
 ---
 jobs..if conditional can be used to prevent a job from running unless a condition is met.
 
+```sh
 name: example-workflow
 on:[push]
 jobs:
@@ -249,3 +250,44 @@ jobs:
         with:
           node-version: '14'
       - run: npm install -g bats
+```
+
+#### Runners
+----
+The Runner determines the underlying compute and OS that the the workflow will execute on.
+
+The runner can be:
+
+- **GitHub-hosted** — GitHub providers predefined runtime environments
+  - Standard size
+    - Linux: ubuntu-latest, ubuntu-22.04, ubuntu-20.04
+    - Windows: windows-latest, windows-2022, windows-2019
+    - MacOS: macos-latest, macos-14, macos-13, macos-12, macos-11
+  - Larger Size
+    - Only available for organizations and enterprises using the GitHub
+    - Team or GitHub Enterprise Cloud plans
+    - More RAM, CPU, and disk space
+    - Static IP addresses
+    - The ability to group runners
+    - Autoscaling to support concurrent workflows
+
+- **Self-hosted** — external compute connected to GitHub using the GitHub Actions self-hosted runner application
+create custom hardware configurations that meet your needs
+
+Use the **runs-on** to specify the runner
+
+```sh
+# specify a specific GitHub-self hosted
+runs-on: ubuntu-latest
+runs-on: windows-latest
+runs-on: macos-latest
+
+# specify multiple possible runners
+runs-on: [macos-14, macos-13, macos-12]
+
+# specify Self-Hosted runner
+runs-on: self-hosted
+```
+
+If you specify an array of strings or variables, your workflow will execute on any runner that matches all of the specified runs-on values.
+
