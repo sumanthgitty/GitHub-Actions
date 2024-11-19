@@ -1,0 +1,39 @@
+name: runners workflow examples
+
+on:
+  push
+
+jobs:
+  test:
+    runs-on: windows-latest  # You can also use 'ubuntu-latest' or 'macos-latest'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'  # You can change this to the version you prefer
+
+      - name: Create hello.py script
+        run: echo 'print("Hello, World!")' > hello.py
+
+      - name: Create test_hello.py script
+        run: |
+          echo 'import unittest' > test_hello.py
+          echo 'from hello import *' >> test_hello.py
+          echo 'class TestHelloWorld(unittest.TestCase):' >> test_hello.py
+          echo '    def test_hello(self):' >> test_hello.py
+          echo '        self.assertEqual(1, 1)' >> test_hello.py
+          echo 'if __name__ == "__main__":' >> test_hello.py
+          echo '    unittest.main()' >> test_hello.py
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # If you have dependencies, add them in requirements.txt and install like:
+          # pip install -r requirements.txt
+
+      - name: Run Python tests
+        run: python -m unittest discover
