@@ -14,7 +14,7 @@ jobs:
           echo "::endgroup::"
       
       - name: "step 1"
-        run : echo "$MY_VAL=Hello" >> $GITHUB_VAR
+        run: echo "$MY_VAL=Hello" >> $GITHUB_VAR
       
       - name: "step 2"
         run: echo $MY_VAR             
