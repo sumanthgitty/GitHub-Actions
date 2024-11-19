@@ -16,4 +16,10 @@ jobs:
       - name: step-B
         run: echo "world"
 
-  
+  job3:
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: job2
+    steps:
+      - name: step-C
+        run: echo "success"
