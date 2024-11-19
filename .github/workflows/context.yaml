@@ -20,5 +20,5 @@ jobs:
         run: |
           echo "environment variable: ${{ env.my_value }}"
 
-      - name: print runner info
-        run: "${{ runner.name }}"
+      - name: runner name
+        run: echo "${{ runner.name }}"
