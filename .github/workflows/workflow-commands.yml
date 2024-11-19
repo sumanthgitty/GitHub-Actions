@@ -14,9 +14,9 @@ jobs:
           echo "::endgroup::"
       
       - name: "step 1"
-        run : echo "$MY_VAL=Hello" >> $GITHUB_VAL
+        run : echo "$MY_VAL=Hello" >> $GITHUB_VAR
       
       - name: "step 2"
-        run: echo $MY_VAL             
+        run: echo $MY_VAR             
 
 #You can also make use of other env varaiable like GITHUB_PATH, GITHUB_OUTPUT, GITHUB_VAR for managing variables path and outputs.
