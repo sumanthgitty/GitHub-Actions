@@ -311,7 +311,7 @@ To set up self-hosted, you need to add a runner and install the **GitHub Actions
 After installing the GitHub Actions Runner, ensure **port 443** is open in your outbound rules to allow secure communication between the runner and GitHub.
 
 #### Workflow Commands Summary
-
+---
 Workflow commands in GitHub Actions let you interact with the runner machine during a workflow, performing tasks like setting environment variables, modifying the system PATH, sending debug messages, or sharing data between steps/jobs.
 
 - Set Environment Variables
@@ -413,3 +413,211 @@ jobs:
     if: ${{ always() }}
     needs: [job1, job2]
 ```
+
+#### Encrypted Secrets
+---
+**Encrypted Secrets** are variables that allow you to **pass sensitive information** to your GitHub Actions Workflow
+
+Secrets are accessed via the **secrets context eg. ${{ secrets.MY_SECRET }}**
+
+- **Organization-Level Secrets**
+you can use access policies to control which repositories can use organization secrets to share secrets between multiple repositories
+Updating organization secrets propagates changes to all shared repos.
+
+- **Repository-level Secrets**
+Secrets that are shared across all environments for a repo.
+
+- **Environment-level Secrets**
+You can enable required reviewers to control access to the secrets
+
+Lower-level env vars override high-level env vars
+
+**NOTE:** Secret names can only contain alphanumeric characters and underscores. No spaces allowed eg. Hello_world123
+- Names must not start with GITHUB_ prefix
+- Names must not start with numbers
+- Names are case-insensitive
+- Names must be unique at the level they are created at
+
+**Encrypted Secrets — Accessing Secrets**
+- Passing Secrets as Inputs
+You can pass secrets as inputs by using the **secrets context**.
+
+```yml
+name: Example of Using Secret as Input
+
+on: [push]
+
+jobs:
+  use-secret-as-input:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Custom Action using Secret
+        uses: example/action@v1
+        with:
+          api-key: ${{ secrets.API_KEY }}
+```
+
+- Passing Secrets as **Env Vars**
+You can also pass secrets to actions or scripts by setting them as environment variables.
+
+```yml
+name: Example Using Secret as Env Var
+
+on: [push]
+
+jobs:
+  use-secret-as-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run a script using Secret
+        run: |
+          echo "Using API key: $API_KEY"
+        env:
+          API_KEY: ${{ secrets. API_KEY }}
+```
+
+**Encrypted Secrets — Settings Secrets**
+- Settings Secrets at the Repository-level
+```sh
+# set a secret and prompt for secret value
+gh secret set SECRET_NAME
+# sets a secret and sets values from a text file
+gh secret set SECRET_NAME < secret.txt
+```
+
+- Settings Secrets at the Environment-level
+```sh
+# set a secret and prompt for secret value
+gh secret set --env ENV_NAME SECRET_NAME
+# get list of secrets for an env
+gh secret list --env ENV_NAME
+```
+
+- Settings Secrets at the Organization-level
+```sh
+# login with admin:org scope to manage org secrets
+gh auth login --scopes "admin:org"
+# set a secret only for private repos and prompt for secret value
+gh secret set --org ORG_NAME SECRET_NAME
+# set a secret for public, private, and internal repos
+gh secret set --org ORG_NAME SECRET_NAME --visibility all
+# set a secret for specific repos
+gh secret set --org ORG_NAME SECRET_NAME --repos REPO-NAME-1, REPO-NAME-2
+# list secrets for the org
+gh secret list --org ORG_NAME
+```
+
+#### Configuration Variables
+---
+Configuration Variables are variables that allow you to **pass non-sensitive information** to your GitHub Actions Workflow
+variables are accessed via the **variable context eg.${{ vars.VAR_NAME }}**
+
+They can be set at various levels:
+- Repository-level
+- Environment-level
+- Organization-level
+
+**Key Features of Variables**
+- Used to parameterize workflows and avoid hardcoding.
+- Can be updated centrally, affecting all workflows relying on them.
+
+Examples:
+
+```bash
+gh variable set MYVARIABLE                                          #repository level
+gh variable set MYVARIABLE --env myenvironment                      #environment level like staging, production, devlopement etc
+gh variable set MYVARIABLE --org myOrg --repos repo1,repo2          #organization level 
+```
+
+#### Default Env Vars
+The **default environment variables that GitHub sets** are available at every step in a workflow.
+example: CI, GITHUB_ACTION, GITHUB_ACTOR, GITHUB_ACTOR_ID, GITHUB_ENV, GITHUB_JOB, GITHUB_REF ....... etc
+You can find the complete list of these default environment variables and their explanations here [GitHub env DOC](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables)
+
+
+```yml
+name: Example Workflow Using Default Env Variables
+
+on: [push]
+
+jobs:
+  example_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Print GitHub Environment Variables
+        run: |
+        echo "Repository Name: $GITHUB_REPOSITORY"
+        echo "Workflow: $GITHUB_WORKFLOW"
+        echo "Action: $GITHUB_ACTION"
+        echo "Actor: $GITHUB_ACTOR"
+```
+
+#### Set Custom Env Vars
+---
+You can define Environment Variables inline within your GitHub Actions workflow.
+
+```yml
+name: Greeting on variable day
+
+on:
+  workflow_dispatch
+
+env:
+  DAY_OF_WEEK: Monday                                               #workflow level
+
+jobs:
+  greeting_job:
+    runs-on: ubuntu-latest
+    env:
+      Greeting: Hello                                               #job level        
+    steps:
+      - name: "Say Hello Mona it's Monday"
+        run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+        env:
+          First_Name: Mona                                          #step level
+```
+
+- **Workflow-level**
+Set env vars of the entire workflow
+- **Job-level**
+Set env vars for the entire job
+- **Step-level**
+Set env vars for the step
+
+We can also access env vars via the **env context**
+
+#### Set Env Vars with Workflow Commands
+---
+In GitHub Actions, you can dynamically set env vars during the execution of your workflows using the **$GITHUB_ENV** special workflow command.
+
+This is useful for passing values between steps, dynamically adjusting behavior based on runtime data, or configuring tools and scripts executed by your workflow.
+
+```yml
+name: Set Environment Variables Example
+
+on: [push]
+
+jobs:
+  setup-and-use-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set dynamic environment variable
+        run: |
+          # Using workflow command to set an environment variable
+          echo "DYNAMIC_VAR=Hello from GitHub Actions" > $GITHUB_ENV
+
+      - name: Use the environment variable
+        run: |
+          # Using the environment variable in a subsequent step
+          echo "The value of DYNAMIC_VAR is: $DYNAMIC_VAR"
+```
+Anything placed into $GITHUB_ENV will be accessible anywhere in your workflow.
