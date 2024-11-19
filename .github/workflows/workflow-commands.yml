@@ -1,0 +1,14 @@
+name: "Workflow Commands"  
+
+on: push
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "group logging"
+        run: |
+          echo "::group::My group Message"
+          echo "msg v1"
+          echo "msg v2"
+          echo "::endgroup::"
