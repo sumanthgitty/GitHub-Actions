@@ -144,7 +144,7 @@ You can trigger a workflow manually via the **GitHub UI, GitHub CLI, or GitHub R
 
 Using the gh workflow run command:
 
-sh```
+```sh
 gh workflow run greet.yml \
 -f name=mona \
 -f greeting=hello \
@@ -353,17 +353,37 @@ steps:
     run: echo "::debug::This is a debug message"
 ```
 
-- Example: Add a directory to PATH and verify:
-
-```yaml
-steps:
-  - name: Add directory to PATH
-    run: echo "$GITHUB_WORKSPACE/my_scripts" >> $GITHUB_PATH
-  - name: Check new PATH
-    run: echo $PATH
-```
-
 Key Points:
 
-$GITHUB_ENV, $GITHUB_PATH, and $GITHUB_OUTPUT are special files for managing variables, PATH, and outputs.
+**$GITHUB_ENV, $GITHUB_PATH, and $GITHUB_OUTPUT** are special files for managing variables, PATH, and outputs.
 Use these commands to efficiently share data for the current workflow run or customize the runner environment during workflows.
+
+#### Workflow Contexts
+---
+Contexts are a way to access information about workflow runs, variables, runner environments, jobs, and steps.
+
+Each context is an object that contains properties, which can be strings or other objects.
+
+You can access contexts using the expression syntax. **${{ <context> }}**
+
+```sh
+steps:
+  - name: Use Secret as Env Var
+    run: echo "Secret Value: $MY_SECRET"
+    env:
+      MY_SECRET: ${{ secrets.MY_SECRET }}
+```
+
+- github — Information about the workflow run.
+- env — Contains variables set in a workflow, job, or step.
+- vars — Contains variables set at the repository, organization, or environment levels.
+- job — Information about the currently running job.
+- jobs — For reusable workflows only, contains outputs of jobs from the reusable workflow.
+- steps — Information about the steps that have been run in the current job.
+- Runner — information about the runner that is running the current job.
+- secrets — Contains the names and values of secrets that are available to a workflow run.
+- strategy — Information about the matrix execution strategy for the current job.
+- matrix — Contains the matrix properties defined in the workflow that apply to the current job.
+- needs — Contains the **outputs** of all jobs that are defined as a dependency of the current job.
+- inputs — Contains the **inputs** of a reusable or manually triggered workflow.
+
