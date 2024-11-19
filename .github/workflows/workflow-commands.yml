@@ -18,6 +18,7 @@ jobs:
           echo "$MY_VAL=Hello" >> $GITHUB_ENV
       
       - name: "step 2"
-        run: echo $MY_VAL            
+        run: | 
+          echo $MY_VAL            
 
 #You can also make use of other env varaiable like GITHUB_PATH, GITHUB_OUTPUT, GITHUB_VAR for managing variables path and outputs.
