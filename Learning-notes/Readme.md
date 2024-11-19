@@ -387,3 +387,29 @@ steps:
 - needs — Contains the **outputs** of all jobs that are defined as a dependency of the current job.
 - inputs — Contains the **inputs** of a reusable or manually triggered workflow.
 
+#### Dependent Jobs
+---
+A workflow run is made up of one or more jobs, which run in parallel by default. To run jobs sequentially, you can define dependencies between them using:
+
+- jobs..needs
+
+```sh
+jobs:
+  job1:
+  job2:
+    needs: job1
+  job3:
+    needs: [job1, job2]
+```
+
+- jobs..if
+
+```sh 
+jobs:
+  job1:
+  job2:
+    needs: job1
+  job3:
+    if: ${{ always() }}
+    needs: [job1, job2]
+```
