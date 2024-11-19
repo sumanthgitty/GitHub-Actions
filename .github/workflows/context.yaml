@@ -20,6 +20,6 @@ jobs:
         run: |
           echo "environment variable info ${{ env.my_value }}"
 
-      - name: print info about step env info
-        output: ${{ steps.env info.outputs }}
+      #- name: print info about step env info
+      # output: ${{ steps.env info.outputs }}
 
