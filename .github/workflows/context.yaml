@@ -18,8 +18,7 @@ jobs:
       
       - name: print env
         run: |
-          echo "environment variable info ${{ env.my_value }}"
+          echo "environment variable: ${{ env.my_value }}"
 
-      #- name: print info about step env info
-      # output: ${{ steps.env info.outputs }}
-
+      - name: print runner info
+        run: "${{ runner.name }}"
