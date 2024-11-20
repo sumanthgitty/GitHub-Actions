@@ -323,15 +323,6 @@ steps:
     run: echo "ACTION_ENV=production" >> $GITHUB_ENV
 ```
 
-- Add to System PATH
-Append a directory to the PATH variable using $GITHUB_PATH:
-
-```yaml
-steps:
-  - name: Add directory to PATH
-    run: echo "/path/to/dir" >> $GITHUB_PATH
-```
-
 - Set Output Parameters
 Share data between steps or jobs using $GITHUB_OUTPUT:
 
@@ -536,6 +527,7 @@ gh variable set MYVARIABLE --org myOrg --repos repo1,repo2          #organizatio
 ```
 
 #### Default Env Vars
+---
 The **default environment variables that GitHub sets** are available at every step in a workflow.
 example: CI, GITHUB_ACTION, GITHUB_ACTOR, GITHUB_ACTOR_ID, GITHUB_ENV, GITHUB_JOB, GITHUB_REF ....... etc
 You can find the complete list of these default environment variables and their explanations here [GitHub env DOC](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables)
@@ -621,3 +613,238 @@ jobs:
           echo "The value of DYNAMIC_VAR is: $DYNAMIC_VAR"
 ```
 Anything placed into $GITHUB_ENV will be accessible anywhere in your workflow.
+
+#### GITHUB_TOKEN Secret
+---
+At the start of each workflow job, GitHub automatically creates a unique GITHUBTOKEN secret to use in your workflow. You can use the GITHUBTOKEN to authenticate in the workflow job.
+
+When you enable GitHub Actions, GitHub installs a GitHub App on your repository.
+
+The **GITHUB_TOKEN** secret is a GitHub App installation access token.
+
+```yml
+name: Open new issue
+on: workflow_dispatch
+
+jobs:
+  open-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - run: |
+        gh issue --repo ${{ github.repository }} \
+          create --title "Issue title" --body "Issue body"
+        env:
+          GH_TOKEN: $ {{ secrets.GITHUB_TOKEN }}
+```
+
+You can use the GITHUB_TOKEN to make authenticated API calls.
+
+When is GITHUB_TOKEN Required?
+- Push Changes to a Repository
+  To commit and push workflow-generated changes back to the repository.
+
+- Trigger Subsequent Workflows
+  To trigger other workflows programmatically (e.g., dispatch events).
+
+- Use GitHub REST or GraphQL APIs
+  For operations like creating issues, managing releases, or triggering workflows.
+
+- Access Private Repositories
+  For interacting with private repositories, such as checking out code or fetching submodules.
+
+- Running Actions That Modify Repository Settings
+  To update branch protection rules, repository secrets, or collaborator permissions.
+
+- Uploading or Downloading Artifacts
+  To securely store or retrieve artifacts during workflow execution.
+
+#### Add Script to Workflow
+---
+You can execute bash scripts within a GitHub Actions workflow
+
+```yml
+jobs:
+  example-job:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Run a script
+        run: ./my-script.sh
+      - name: Run another script
+        run: ./my-other-script.sh
+```
+
+#### Publish GitHub Package using Workflow
+---
+You can use a workflow to build a GitHub Package
+( GitHub Packages is a service offered by GitHub for hosting and managing packages, such as dependencies or container images, within your GitHub repository. It allows you to store and share various types of packages (e.g., npm, Maven, Docker, RubyGems) directly in GitHub. You can integrate GitHub Packages with workflows in GitHub Actions for automating your CI/CD pipelines. )
+
+```yml
+name: Create and publish a Docker image
+on:
+  push:
+    branches: ['release']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Log in the Container registry
+        uses: docker/login-action@65b78...
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57...
+        with:
+          images: $ {{ env.REGISTRY }} /${{ env.IMAGE_NAME }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d...
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+```
+
+#### Publish Docker Hub Registry using Workflow
+---
+You can use a workflow to build and publish to Docker Hub Registry
+
+```yml
+name: Publish Docker image
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses docker/login-action@f4e78...
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57...
+        with:
+          images: my-docker-hub-namespace/my-docker-hub-repository
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@3b5e8...
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+```
+
+#### Publish GitHub Container Registry using Workflow
+---
+Pushing container to the GitHub Container Registry
+
+```yml
+name: Publish Docker Image
+
+on: [push]
+
+jobs:
+  build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.CR_PAT }} # or use GITHUB_TOKEN
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Build and push Docker image
+      users: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/my-image latest
+    - name: Verify the image was pushed
+      run: docker pull ghcr.io/${{ github.repository_owner }}/my-image latest
+```
+
+#### Publish Component as GitHub Release
+---
+Publishing Components as GitHub Release
+
+```yml
+name: Release Workflow
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
+
+  - name: Build project
+    run: |
+      echo "Build your project here"
+      # Example: gcc -o output_binary source_code.c
+
+  - name: Create Release
+    id: create_release
+    uses: actions/create-release@v1
+    env:
+      GITHUB_TOKEN: $ {{ secrets.GITHUB_TOKEN }}
+    with:
+      tag_name: ${{ github.ref }}
+      release_name: Release ${{ github.ref }}
+      draft: false
+      prerelease: false
+
+  - name: Upload Release Asset
+    uses: actions/upload-release-asset@v1
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      upload_url: ${{ steps.create.release.outputs.upload_url }}
+      asset_path: ./path/to/your/output_binary
+      asset_name: output_binary_name
+      asset_content_type: application/octet-stream
+```
