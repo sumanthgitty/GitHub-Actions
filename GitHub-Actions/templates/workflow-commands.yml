@@ -1,0 +1,24 @@
+name: "Workflow Commands"  
+
+on: push
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "group logging"
+        run: |
+          echo "::group::My group Message"
+          echo "msg v1"
+          echo "msg v2"
+          echo "::endgroup::"
+      
+      - name: "step 1"
+        run: |
+          echo "MY_VAL=Hello" >> $GITHUB_ENV
+      
+      - name: "step 2"
+        run: | 
+          echo $MY_VAL            
+
+#You can also make use of other env varaiable like GITHUB_PATH, GITHUB_OUTPUT, GITHUB_VAR for managing variables path and outputs.

@@ -1,0 +1,25 @@
+name: "Dependent workflow jobs"
+
+on: 'push'
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: step-A
+        run: echo "hello"
+
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps: 
+      - name: step-B
+        run: echo "world"
+
+  job3:
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    needs: job2
+    steps:
+      - name: step-C
+        run: echo "success"
