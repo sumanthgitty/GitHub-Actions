@@ -848,3 +848,183 @@ steps:
       asset_name: output_binary_name
       asset_content_type: application/octet-stream
 ```
+
+A **release** in GitHub is a versioned snapshot of your repository. It typically represents a stable version of your code and includes a Git tag, release notes, and optional files (assets) such as binaries or build artifacts. Releases make it easy for others to download, use, or deploy your project. Using GitHub Actions, you can automate the creation and publishing of GitHub releases with predefined actions like actions/create-release for generating the release and actions/upload-release-asset for attaching assets.
+
+#### Deploy Release to Cloud Provider
+---
+You can deploy releases to specific CSP:
+
+- Amazon Elastic Container Service (ECS)
+- Google Kubernetes Engine
+- Azure App Services, Azure Kubernetes Service (EKS), Azure Static Web Apps
+
+#### Service Containers
+---
+A container service is a temporary containerized environment that runs alongside your workflow jobs. It is typically used to provide services (like a database or cache) that your application or tests require to function properly.
+
+Key Points:
+- Lifecycle: The service container starts when the job begins and stops when the job ends.
+- Isolation: It runs in isolation from the main job environment, providing a clean and reproducible setup for testing or development.
+- Configuration: Define the service in your workflow under the services key, specifying the image, environment variables, ports, and health checks.
+- Access: The service is accessible via localhost or specified ports.
+
+Why and When to Use It:
+- For Testing: To simulate dependencies like a database (MySQL/PostgreSQL), caching service (Redis), or message queue (RabbitMQ) in a controlled environment.
+- For Integration: Test how your application interacts with external systems without needing to connect to production services.
+- For Reproducibility: Ensure consistent testing by spinning up a fresh service instance every time a workflow runs.
+
+By using service containers, you can test, debug, and validate your workflows in isolated and predictable environments.
+
+```yml
+name: PostgreSQL Container Service
+on: push
+
+jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    container: node:14
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          cd ./github-actions/pg
+          npm install
+
+      - name: Connect to PostgreSQL
+        run: node ./github-actions/pg/client.js
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+```
+
+note: You can use the **credentials** keyword if your container image requires authentication to pull from a private registry.
+```yml
+services:
+  my-service:
+    image: private-registry/my-image:latest
+    credentials:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_PASSWORD }}
+```
+
+#### Routing Workflow to Runner
+---
+Routing workflows to runners involves specifying where a GitHub Actions workflow should execute. Runners are servers that run your workflow jobs, and they can be hosted by GitHub (e.g., ubuntu-latest, windows-latest) or self-hosted (custom hardware or VMs set up by you).
+
+A self hosted runner automatically receives certain lables when it is added to github actions
+
+**Default Labels:**
+- self-hosted - Indicates it is a self-hosted runner.
+- OS-specific (e.g., linux, windows, or macOS).
+- Architecture (e.g., x64, arm64).
+
+You can also add **custom labels** during or after setup to make routing more specific (e.g., high-memory, gpu). For instance:
+
+```yaml
+runs-on: [self-hosted, linux, x64, gpu]
+
+``` 
+
+A self hosted runner must have all four labels to be eligible to process the job.
+
+**Runner groups** are used to collect sets of runners and create a security boundary around them. Only Entirprise accounts, organizations owned by enterprise accounts, and organizations using GitHub Team can create and manage additional runner groups.
+
+```yml
+runs-on: [self-hosted, linux, group_name]
+```
+
+#### CodeQL Step
+---
+CodeQL into a Github Actions workflow can automate the process of code analysis, allowing you to find and fix security issues before they are exploited. 
+
+you can set up CodeQL analysis in GitHub Actions using predefined actions like github/codeql-action/init@v1 and github/codeql-action/analyze@v1. These actions help integrate CodeQL into your GitHub workflows, enabling security analysis for your codebase.
+
+```yml
+jobs:
+  analyze:
+    name: Analyze code with CodeQL
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: 'javascript'  # Add other languages if needed
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v1
+```
+
+#### Caching Package and Dependency Files
+---
+To make your workflow faster and more efficient, you can create and use caches for dependencies and other commonly reused files.
+
+The following package managers and and their Action:
+- npm, yarn, pnpm: setup-node
+- pip, pipenv, Poetry: setuppython
+- Gradle, Maven: setup-java
+- RubyGems: setup-ruby
+- Go go.sum: setup-go
+ 
+```yml
+- name: Set up Ruby
+  uses: ruby/setup-ruby@v1
+  with:
+    bundler-cache: true
+
+- name: Cache Ruby dependencies
+  uses: actions/cache@v2
+  with:
+    path: ~/.bundle
+    key: ${{ runner.os }}-ruby-${{ hashFiles('**/*.gemspec') }}
+    restore-keys: |
+      ${{ runner.os }}-ruby-
+```
+
+- **actions/setup-\*** installs and configures the necessary language or environment for the project.
+- **actions/cache** is used for caching the dependencies so that future workflow runs can restore these dependencies without needing to download or rebuild them.
+
+
+#### Remove Workflow Artifact from GitHub
+---
+Artifact typically refers to build outputs or files generated during the workflow that you may want to store or use later.
+
+To delete the workflow artifact you need to delete them via UI , once you delete it cannot be restored.
+
+by default github stores build and artifacts for 90 days, and its retention period can be customized.
+
+#### Workflow Status Badge
+---
+Workflow badges in GitHub Actions are visual indicators that display the current status of a workflow, such as whether it passed or failed. These badges are typically displayed in the README file in repository.
+
+To add a workflow badge:
+
+- Go to the Actions tab of your GitHub repository.
+- Select the desired workflow.
+- Click on the "badge" icon to copy the markdown snippet, or manually create a badge using the format:
+
+```md
+![Build Status](https://img.shields.io/github/workflow/status/your-username/your-repo/your-workflow-name)
+```
+
+This will display the status of the workflow in your repository's README or any other markdown file.
+
