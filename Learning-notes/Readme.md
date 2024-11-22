@@ -1,3 +1,5 @@
+#### GitHub Actions Basics
+----
 #### Introduction to GitHub Actions
 ---
 GitHub Actions is a CI/CD pipeline directly integrated with your GitHub repository.
@@ -251,9 +253,10 @@ jobs:
           node-version: '14'
       - run: npm install -g bats
 ```
-
-#### Runners
+#### Runners and Commands
 ----
+#### Runners
+---
 The Runner determines the underlying compute and OS that the the workflow will execute on.
 
 The runner can be:
@@ -349,6 +352,8 @@ Key Points:
 **$GITHUB_ENV, $GITHUB_PATH, and $GITHUB_OUTPUT** are special files for managing variables, PATH, and outputs.
 Use these commands to efficiently share data for the current workflow run or customize the runner environment during workflows.
 
+#### Advanced Workflows
+----
 #### Workflow Contexts
 ---
 Contexts are a way to access information about workflow runs, variables, runner environments, jobs, and steps.
@@ -680,7 +685,8 @@ jobs:
       - name: Run another script
         run: ./my-other-script.sh
 ```
-
+#### Publishing and Deployment
+----
 #### Publish GitHub Package using Workflow
 ---
 You can use a workflow to build a GitHub Package
@@ -859,6 +865,8 @@ You can deploy releases to specific CSP:
 - Google Kubernetes Engine
 - Azure App Services, Azure Kubernetes Service (EKS), Azure Static Web Apps
 
+#### Optimization and Management
+----
 #### Service Containers
 ---
 A container service is a temporary containerized environment that runs alongside your workflow jobs. It is typically used to provide services (like a database or cache) that your application or tests require to function properly.
@@ -1027,4 +1035,64 @@ To add a workflow badge:
 ```
 
 This will display the status of the workflow in your repository's README or any other markdown file.
+
+#### Env Protections
+---
+Yoc can configure **environments** with protection rules and references an environment in your Workflow Job.
+
+- Each job in a workflow can refernce a single environment. 
+- Any protection rules configured for a environment must pass before a job referencing the environment is sent to a runner.
+- The job can access the environment's secrets only after the job is sent to a runner.
+
+```yml
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deployment:
+  runs-on: ubuntu-latest
+  environment: production
+  steps:
+    - name: deploy
+    # ....
+```
+
+#### Job Matrix Configuration
+---
+A matrix startegy allow you use variables in single job definition to automatically create multiple job runs that are based on the combinations of the variables.
+
+```yml
+jobs:
+  example-matrix:
+    strategy:
+      matrix:
+        version: [10, 12, 14]
+        os: [ubuntu-latest, windows- latest]
+```
+```yml
+{version: 10, os: ubuntu-latest}
+{version: 10, os: windows-latest}
+{version: 12, os: ubuntu-latest}
+{version: 12, os: windows-latest}
+{version: 14, os: ubuntu-latest}
+{version: 14, os: windows-latest}
+```
+This will result in 6 job runs.
+
+#### Advanced GitHub Actions
+----
+#### Action Types
+---
+In **custom actions**, the type of action determines how it operates within a workflow.
+
+- **Docker container actions**: Docker container runs your code in docker container. 
+
+- **JavaScript actions**: JavaScript runs directly on the runner host OS.
+
+- **Composite Actions**: A composite action allows you to combine multiple workflow steps within one action.
+
 
