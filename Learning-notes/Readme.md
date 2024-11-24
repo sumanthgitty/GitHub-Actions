@@ -1121,7 +1121,7 @@ runs:
   main: "index.js"
 ```
 using determines whether this is a Jacascript action. a composite action, or a docker container action and how the action is executed.
-
+```yml
 .
 ├── .github/
 │   ├── workflows/
@@ -1131,7 +1131,7 @@ using determines whether this is a Jacascript action. a composite action, or a d
 │           ├── action.yml        # Your custom action definition
 │           ├── index.js          # The main JavaScript file
 │           └── package.json      # If needed for dependencies
-
+```
 #### Action Versions
 ---
 **General Recommendations**
@@ -1150,7 +1150,7 @@ We recommend using tags for actions release management. Using this approach, you
 #### Files and Directories for Actions
 ---
 - **For Javascript**
-
+```yml
 my-repo/
 ├── .github/
 │   ├── workflows/
@@ -1164,7 +1164,7 @@ my-repo/
 │           ├── dist/              # Compiled files for JavaScript/TypeScript (optional)
 │           └── README.md          # Documentation for the custom action
 └── .gitignore                     # Ignores files like node_modules if necessary
-
+```
 Essential files: 
   - action.yml
     Metadata defining inputs, outputs, and runtime.
@@ -1187,7 +1187,7 @@ Essential files:
     Excludes unnecessary files like node_modules.
 
 - **For Docker Container**
-
+```yml
 my-docker-action/
 ├── Dockerfile              # Defines the container image for the action
 ├── action.yml              # Metadata for the action (inputs, outputs, runs)
@@ -1196,6 +1196,7 @@ my-docker-action/
 ├── .dockerignore           # Files to exclude from the Docker image
 ├── test/                   # (Optional) Directory for test scripts
 └── .gitignore              # Excludes unnecessary files from the repository
+```
 
 Essential files: 
   - action.yml:
