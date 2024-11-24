@@ -1214,3 +1214,18 @@ my-docker-action/
       - .dockerignore:
         Excludes files like .git or node_modules from the Docker image to optimize size.
 
+#### Setting exit codes for actions
+---
+You can use exit codes to set the status of an action. GitHub displays statuses to indicate passing or failing actions
+
+#### Reusable Templates for Actions and Workflows
+---
+Workflow Templates is an enterprise feature that allow you to create reusable templates that other enterprise members can use. 
+
+Users with write access to the enterprise .github repository can create workflows from these workflow templates.
+
+To create a workflow template:
+
+- Create a workflow file (workflow.yml) and a metadata file (metadata.json) in the public .github repository.
+- Both files must be placed within a directory named workflow-templates.
+- Ensure the workflow.yml file and metadata.json file have the same name.
