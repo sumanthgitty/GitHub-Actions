@@ -1165,26 +1165,26 @@ my-repo/
 │           └── README.md          # Documentation for the custom action
 └── .gitignore                     # Ignores files like node_modules if necessary
 ```
-Essential files: 
-  - action.yml
-    Metadata defining inputs, outputs, and runtime.
-    Specifies the main entry point.
-  
-  - index.js
-    Core JavaScript logic for the action.
-    Uses @actions/core and optionally @actions/github.
+    Essential files: 
+      - action.yml
+        Metadata defining inputs, outputs, and runtime.
+        Specifies the main entry point.
       
-  - package.json
-    Lists dependencies like @actions/core and action metadata.
-      
-  - README.md
-    Explains how to use the action with examples.
-      
-  - node_modules/ or dist/
-    Bundled dependencies or compiled files (if applicable).
-      
-  - .gitignore
-    Excludes unnecessary files like node_modules.
+      - index.js
+        Core JavaScript logic for the action.
+        Uses @actions/core and optionally @actions/github.
+          
+      - package.json
+        Lists dependencies like @actions/core and action metadata.
+          
+      - README.md
+        Explains how to use the action with examples.
+          
+      - node_modules/ or dist/
+        Bundled dependencies or compiled files (if applicable).
+          
+      - .gitignore
+        Excludes unnecessary files like node_modules.
 
 - **For Docker Container**
 ```yml
@@ -1198,19 +1198,19 @@ my-docker-action/
 └── .gitignore              # Excludes unnecessary files from the repository
 ```
 
-Essential files: 
-  - action.yml:
-    Defines the action with details like inputs, outputs, and the Docker runtime.
+    Essential files: 
+      - action.yml:
+        Defines the action with details like inputs, outputs, and the Docker runtime.
 
-  - Dockerfile:
-    Builds the container image, installing dependencies and setting up the runtime environment.
+      - Dockerfile:
+        Builds the container image, installing dependencies and setting up the runtime environment.
 
-  - entrypoint.sh or Executable File:
-    The main script or application the container runs when executed.
+      - entrypoint.sh or Executable File:
+        The main script or application the container runs when executed.
 
-  - README.md:
-    Explains how to use the action, including examples.
+      - README.md:
+        Explains how to use the action, including examples.
 
-  - .dockerignore:
-    Excludes files like .git or node_modules from the Docker image to optimize size.
+      - .dockerignore:
+        Excludes files like .git or node_modules from the Docker image to optimize size.
 
