@@ -1095,4 +1095,121 @@ In **custom actions**, the type of action determines how it operates within a wo
 
 - **Composite Actions**: A composite action allows you to combine multiple workflow steps within one action.
 
+#### Inputs and Outputs for Actions
+---
+```yml
+inputs:
+  input-value:
+    description: "An input string to process."
+    required: true
+    default: "Default input"
+```
+Inputs specify data that the action expects to use during runtime. 
+Passed to the action using with in the workflow.
+
+```yml
+outputs:
+  result-message:
+    description: "A processed message to return to the workflow."
+```
+Outputs Allow your action to send data back to the workflow or other steps. These are also defined in the action.yml file.
+Set in the script using core.setOutput and accessed in the workflow using steps.<step-id>.outputs.<output-name>.
+
+```yml
+runs:
+  using: "node12"
+  main: "index.js"
+```
+using determines whether this is a Jacascript action. a composite action, or a docker container action and how the action is executed.
+
+.
+├── .github/
+│   ├── workflows/
+│   │   └── example-workflow.yml  # Calls the custom action
+│   └── actions/
+│       └── custom-js-action/
+│           ├── action.yml        # Your custom action definition
+│           ├── index.js          # The main JavaScript file
+│           └── package.json      # If needed for dependencies
+
+#### Action Versions
+---
+**General Recommendations**
+- Users can expect an action's patch version to include necessary critical fixes and security patches, while still remaining compatible with their existing workflows.
+- You should consider releasing a new major version whenever your changes affect compatibility.
+- you can recommend that your users specify a major version when using your action, and only direct them to a more specific version if they encounter issues.
+
+**Tagging Recommendations**
+We recommend using tags for actions release management. Using this approach, your users can easily distinguish between major and minor versions:
+- Create and validate a release on a release branch (such as release/v1) before creating the release tag (for example, v1.0.2).
+- Create a release using semantic versioning. 
+- Move the major version tag (such as v1, v2) to point to the Git ref of the current release.
+- Introduce a new major version tag (v2) for changes that will break existing workflows. For example, changing an action's inputs would be a breaking change.
+- Major versions can be initially released with a beta tag to indicate their status, for example, v2-beta. The -beta tag can then be removed when ready.
+
+#### Files and Directories for Actions
+---
+- **For Javascript**
+
+my-repo/
+├── .github/
+│   ├── workflows/
+│   │   └── example-workflow.yml   # Workflow file using the custom action
+│   └── actions/
+│       └── my-action/
+│           ├── action.yml         # Metadata file for the custom action
+│           ├── index.js           # Main script for the custom action
+│           ├── package.json       # JavaScript dependencies (if applicable)
+│           ├── node_modules/      # Installed dependencies (optional, if not pre-built)
+│           ├── dist/              # Compiled files for JavaScript/TypeScript (optional)
+│           └── README.md          # Documentation for the custom action
+└── .gitignore                     # Ignores files like node_modules if necessary
+
+Essential files: 
+  - action.yml
+    Metadata defining inputs, outputs, and runtime.
+    Specifies the main entry point.
+  
+  - index.js
+    Core JavaScript logic for the action.
+    Uses @actions/core and optionally @actions/github.
+      
+  - package.json
+    Lists dependencies like @actions/core and action metadata.
+      
+  - README.md
+    Explains how to use the action with examples.
+      
+  - node_modules/ or dist/
+    Bundled dependencies or compiled files (if applicable).
+      
+  - .gitignore
+    Excludes unnecessary files like node_modules.
+
+- **For Docker Container**
+
+my-docker-action/
+├── Dockerfile              # Defines the container image for the action
+├── action.yml              # Metadata for the action (inputs, outputs, runs)
+├── entrypoint.sh           # Script or application executed by the container
+├── README.md               # Documentation for the action
+├── .dockerignore           # Files to exclude from the Docker image
+├── test/                   # (Optional) Directory for test scripts
+└── .gitignore              # Excludes unnecessary files from the repository
+
+Essential files: 
+  - action.yml:
+    Defines the action with details like inputs, outputs, and the Docker runtime.
+
+  - Dockerfile:
+    Builds the container image, installing dependencies and setting up the runtime environment.
+
+  - entrypoint.sh or Executable File:
+    The main script or application the container runs when executed.
+
+  - README.md:
+    Explains how to use the action, including examples.
+
+  - .dockerignore:
+    Excludes files like .git or node_modules from the Docker image to optimize size.
 
