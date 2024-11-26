@@ -1229,3 +1229,16 @@ To create a workflow template:
 - Create a workflow file (workflow.yml) and a metadata file (metadata.json) in the public .github repository.
 - Both files must be placed within a directory named workflow-templates.
 - Ensure the workflow.yml file and metadata.json file have the same name.
+
+#### Configure Self-hosted Runner for Enterprise
+---
+Self hosted runeers for GitHub Enterprise have additional configuration options
+
+**Proxy Servers**
+The following environment variables are available.
+- https_proxy - URLs for HTTP Traffic to proxy.
+- http_proxy - URLs for HTTP Traffic to proxy.
+- no_proxy - URLs that should not be used as a proxy.
+
+**IP Allowlists**
+You must add the IP address or range of your self-hosted runners to the IP allowlist of communication to work. This ensures the servers can communicate with GitHub's infrastructure, enabling the runners to execute workflows successfully.
